@@ -1,0 +1,28 @@
+version: "3"
+services:
+  https:
+    image: steveltn/https-portal:1
+    ports:
+      - '3443:443'
+    environment:
+      STAGE: local
+      DOMAINS: 'localhost -> http://host.docker.internal:8080'
+  web:
+    build: .
+    image: deno_sample_app:deno
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: deno-db
+      MYSQL_USER: deno
+      MYSQL_PASSWORD: deno
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
